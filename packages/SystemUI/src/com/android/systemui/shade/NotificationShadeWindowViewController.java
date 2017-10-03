@@ -138,6 +138,9 @@ public class NotificationShadeWindowViewController {
             };
     private final SystemClock mClock;
 
+    private GestureDetector mQQSGestureHandler;
+    private final QQSGestureListener mQQSGestureListener;
+
     @Inject
     public NotificationShadeWindowViewController(
             LockscreenShadeTransitionController transitionController,
@@ -171,9 +174,14 @@ public class NotificationShadeWindowViewController {
             NotificationExpansionRepository notificationExpansionRepository,
             FeatureFlags featureFlags,
             SystemClock clock,
+<<<<<<< HEAD
             BouncerMessageInteractor bouncerMessageInteractor,
             BouncerLogger bouncerLogger,
             KeyEventInteractor keyEventInteractor) {
+=======
+            Provider<MultiShadeMotionEventInteractor> multiShadeMotionEventInteractorProvider,
+            QQSGestureListener qqsGestureListener) {
+>>>>>>> 4baf41ca48fa (SystemUI: Add double tap to sleep gesture)
         mLockscreenShadeTransitionController = transitionController;
         mFalsingCollector = falsingCollector;
         mStatusBarStateController = statusBarStateController;
@@ -198,8 +206,12 @@ public class NotificationShadeWindowViewController {
         mLockscreenHostedDreamGestureListener = lockscreenHostedDreamGestureListener;
         mNotificationInsetsController = notificationInsetsController;
         mIsTrackpadCommonEnabled = featureFlags.isEnabled(TRACKPAD_GESTURE_COMMON);
+<<<<<<< HEAD
         mFeatureFlags = featureFlags;
         mKeyEventInteractor = keyEventInteractor;
+=======
+        mQQSGestureListener = qqsGestureListener;
+>>>>>>> 4baf41ca48fa (SystemUI: Add double tap to sleep gesture)
 
         // This view is not part of the newly inflated expanded status bar.
         mBrightnessMirror = mView.findViewById(R.id.brightness_mirror_container);
@@ -248,10 +260,16 @@ public class NotificationShadeWindowViewController {
         mStackScrollLayout = mView.findViewById(R.id.notification_stack_scroller);
         mPulsingWakeupGestureHandler = new GestureDetector(mView.getContext(),
                 mPulsingGestureListener);
+<<<<<<< HEAD
         if (mFeatureFlags.isEnabled(LOCKSCREEN_WALLPAPER_DREAM_ENABLED)) {
             mDreamingWakeupGestureHandler = new GestureDetector(mView.getContext(),
                     mLockscreenHostedDreamGestureListener);
         }
+=======
+        mQQSGestureHandler = new GestureDetector(mView.getContext(),
+                mQQSGestureListener);
+
+>>>>>>> 4baf41ca48fa (SystemUI: Add double tap to sleep gesture)
         mView.setLayoutInsetsController(mNotificationInsetsController);
         mView.setInteractionEventHandler(new NotificationShadeWindowView.InteractionEventHandler() {
             @Override
@@ -311,10 +329,18 @@ public class NotificationShadeWindowViewController {
                 }
 
                 mFalsingCollector.onTouchEvent(ev);
+<<<<<<< HEAD
                 mPulsingWakeupGestureHandler.onTouchEvent(ev);
                 if (mDreamingWakeupGestureHandler != null
                         && mDreamingWakeupGestureHandler.onTouchEvent(ev)) {
                     return logDownDispatch(ev, "dream wakeup gesture handled", true);
+=======
+                mQQSGestureHandler.onTouchEvent(ev);
+                // Pass touch events to the pulsing gesture listener only if it's dozing,
+                // otherwise lockscreen DT2S and AOD DT2W will conflict.
+                if (mStatusBarStateController.isDozing()) {
+                    mPulsingWakeupGestureHandler.onTouchEvent(ev);
+>>>>>>> 4baf41ca48fa (SystemUI: Add double tap to sleep gesture)
                 }
                 if (mStatusBarKeyguardViewManager.dispatchTouchEvent(ev)) {
                     return logDownDispatch(ev, "dispatched to Keyguard", true);
