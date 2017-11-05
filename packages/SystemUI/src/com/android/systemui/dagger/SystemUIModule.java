@@ -70,6 +70,7 @@ import com.android.systemui.plugins.BcSmartspaceConfigPlugin;
 import com.android.systemui.plugins.BcSmartspaceDataPlugin;
 import com.android.systemui.privacy.PrivacyModule;
 import com.android.systemui.process.condition.SystemProcessCondition;
+import com.android.systemui.syberia.SyberiaModule;
 import com.android.systemui.qrcodescanner.dagger.QRCodeScannerModule;
 import com.android.systemui.qs.FgsManagerController;
 import com.android.systemui.qs.FgsManagerControllerImpl;
@@ -207,6 +208,7 @@ import javax.inject.Named;
             ScreenRecordModule.class,
             SettingsUtilModule.class,
             ShadeModule.class,
+            SyberiaModule.class,
             SmartRepliesInflationModule.class,
             SmartspaceModule.class,
             StatusBarPipelineModule.class,
