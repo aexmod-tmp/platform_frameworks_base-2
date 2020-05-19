@@ -59,6 +59,7 @@ LOCAL_REQUIRED_MODULES := \
     FontTaurusSourceOverlay \
     FontTechnicalSourceOverlay \
     FontUbuntuRegularSourceOverlay \
+    GesturalNavigationOverlayHidden \
     IconPackCircularAndroidOverlay \
     IconPackCircularLauncherOverlay \
     IconPackCircularSettingsOverlay \
