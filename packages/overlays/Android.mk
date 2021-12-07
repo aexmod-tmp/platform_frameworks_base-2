@@ -120,6 +120,7 @@ LOCAL_REQUIRED_MODULES := \
     NavigationBarModeGesturalOverlayExtraWideBack \
     TransparentNavigationBarOverlay \
     NotesRoleEnabledOverlay \
+    NavigationBarModeGesturalOverlayFS \
     preinstalled-packages-platform-overlays.xml
 
 include $(BUILD_PHONY_PACKAGE)
