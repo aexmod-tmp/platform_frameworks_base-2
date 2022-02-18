@@ -79,7 +79,6 @@ import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.internal.policy.GestureNavigationSettingsObserver;
 import com.android.systemui.R;
 import com.android.systemui.Dependency;
-import com.android.systemui.assist.AssistManager;
 import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.dagger.qualifiers.Main;
 import com.android.systemui.flags.FeatureFlags;
@@ -261,7 +260,6 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
     private boolean mIsOnLeftEdge;
     private boolean mDeferSetIsOnLeftEdge;
 
-    private AssistManager mAssistManager;
     private int mTimeout = 2000; //ms
     private int mLeftLongSwipeAction;
     private int mRightLongSwipeAction;
@@ -459,7 +457,6 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
                 mContext.getMainThreadHandler(), mContext, this::onNavigationSettingsChanged);
 
         mHandler = new Handler();
-        mAssistManager = Dependency.get(AssistManager.class);
         updateCurrentUserResources();
     }
 
@@ -1261,8 +1258,7 @@ public class EdgeBackGestureHandler implements PluginListener<NavigationEdgeBack
             case 0: // No action
             default:
                 break;
-            case 1: // Assistant
-                mAssistManager.startAssist(new Bundle() /* args */);
+            case 1:
                 break;
             case 2: // Voice search
                 ActionUtils.launchVoiceSearch(mContext);
