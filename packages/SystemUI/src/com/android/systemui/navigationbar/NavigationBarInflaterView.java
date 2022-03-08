@@ -185,8 +185,11 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
     }
 
     private void onNavigationModeChanged(int mode) {
-        mNavBarMode = mode;
-        updateHint();
+        if (mNavBarMode != mode) {
+            mNavBarMode = mode;
+            updateHint();
+            onLikelyDefaultLayoutChange(false);
+        }
     }
 
     @Override
@@ -211,7 +214,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
         } else if (KEY_NAVIGATION_HINT.equals(key)) {
             mIsHintEnabled = TunerService.parseIntegerSwitch(newValue, true);
             updateHint();
-            onLikelyDefaultLayoutChange();
+            onLikelyDefaultLayoutChange(true);
         }
     }
 
@@ -221,10 +224,10 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
         updateLayoutInversion();
     }
 
-    public void onLikelyDefaultLayoutChange() {
+    public void onLikelyDefaultLayoutChange(boolean force) {
         // Reevaluate new layout
         final String newValue = getDefaultLayout();
-        if (!Objects.equals(mCurrentLayout, newValue)) {
+        if (!Objects.equals(mCurrentLayout, newValue) || force) {
             clearViews();
             inflateLayout(newValue);
         }
