@@ -6453,6 +6453,11 @@ public final class Settings {
         public static final String FP_ERROR_VIBRATE = "fingerprint_error_vib";
 
         /**
+         * @hide
+         */
+        public static final String ENABLE_TASKBAR = "enable_taskbar";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
