@@ -98,6 +98,7 @@ LOCAL_REQUIRED_MODULES := \
     IconPackOutlineSettingsOverlay \
     IconPackOutlineSystemUIOverlay \
     IconPackAcherusAndroidOverlay \
+    IconPackAcherusSettingsOverlay \
     IconPackAcherusSystemUIOverlay \
     IconShapeCloudyOverlay \
     IconShapeCylinderOverlay \
