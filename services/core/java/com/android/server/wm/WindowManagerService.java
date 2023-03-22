@@ -199,6 +199,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
+import android.os.DeviceIntegrationUtils;
 import android.os.Handler;
 import android.os.HandlerExecutor;
 import android.os.IBinder;
@@ -1734,6 +1735,12 @@ public class WindowManagerService extends IWindowManager.Stub
             win.attach();
             mWindowMap.put(client.asBinder(), win);
             win.initAppOpsState();
+
+            // Device Integration: add black window if match
+            if (!DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION) {
+                BlackScreenWindowManager.getInstance().onWindowAdded(win);
+            }
+
             win.setHiddenWhileSuspended(suspended);
 
             final boolean hideSystemAlertWindows = !mHidingNonSystemOverlayWindows.isEmpty();
@@ -1980,6 +1987,11 @@ public class WindowManagerService extends IWindowManager.Stub
     void postWindowRemoveCleanupLocked(WindowState win) {
         ProtoLog.v(WM_DEBUG_ADD_REMOVE, "postWindowRemoveCleanupLocked: %s", win);
         mWindowMap.remove(win.mClient.asBinder());
+
+        // Device Integration: Remove black screen if match
+        if (!DeviceIntegrationUtils.DISABLE_DEVICE_INTEGRATION) {
+            BlackScreenWindowManager.getInstance().onWindowRemoved(win);
+        }
 
         final DisplayContent dc = win.getDisplayContent();
         dc.getDisplayRotation().markForSeamlessRotation(win, false /* seamlesslyRotated */);
