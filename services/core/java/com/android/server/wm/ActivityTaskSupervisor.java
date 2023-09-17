@@ -3016,6 +3016,12 @@ public class ActivityTaskSupervisor implements RecentTasks.Callbacks {
                     mService.continueWindowLayout();
                 }
             }
+            if (activityOptions != null) {
+                final int windowingMode = activityOptions.getLaunchWindowingMode();
+                if (windowingMode == WINDOWING_MODE_FREEFORM) {
+                    task.setBounds(activityOptions.getLaunchBounds());
+                }
+            }
             taskCallingUid = task.mCallingUid;
             callingPackage = task.mCallingPackage;
             callingFeatureId = task.mCallingFeatureId;
