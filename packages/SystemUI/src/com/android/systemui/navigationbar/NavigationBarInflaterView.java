@@ -20,6 +20,8 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.WindowManagerPolicyConstants.NAV_BAR_MODE_3BUTTON;
 import static android.view.WindowManagerPolicyConstants.NAV_BAR_MODE_GESTURAL;
 
+import static com.android.systemui.shared.recents.utilities.Utilities.isLargeScreen;
+
 import android.annotation.Nullable;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -93,6 +95,9 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
 
     private static final String KEY_NAVIGATION_HINT =
             "system:" + Settings.System.NAVIGATION_BAR_HINT;
+    private static final String ENABLE_TASKBAR =
+            "system:" + Settings.System.ENABLE_TASKBAR;
+
     private static final String OVERLAY_NAVIGATION_HIDE_HINT =
             "com.custom.overlay.systemui.gestural.hidden";
 
@@ -135,6 +140,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
 
     private boolean mInverseLayout;
     private boolean mIsHintEnabled;
+    private boolean mIsTaskbarEnabled;
 
     public NavigationBarInflaterView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -197,6 +203,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
         super.onAttachedToWindow();
         Dependency.get(TunerService.class).addTunable(this, NAV_BAR_INVERSE);
         Dependency.get(TunerService.class).addTunable(this, KEY_NAVIGATION_HINT);
+        Dependency.get(TunerService.class).addTunable(this, ENABLE_TASKBAR);
     }
 
     @Override
@@ -215,6 +222,10 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
             mIsHintEnabled = TunerService.parseIntegerSwitch(newValue, true);
             updateHint();
             onLikelyDefaultLayoutChange(true);
+        } else if (ENABLE_TASKBAR.equals(key)) {
+            mIsTaskbarEnabled =
+                TunerService.parseIntegerSwitch(newValue, isLargeScreen(mContext));
+            updateHint();
         }
     }
 
@@ -280,7 +291,8 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
     private void updateHint() {
         final IOverlayManager iom = IOverlayManager.Stub.asInterface(
                 ServiceManager.getService(Context.OVERLAY_SERVICE));
-        final boolean state = mNavBarMode == NAV_BAR_MODE_GESTURAL && !mIsHintEnabled;
+        final boolean state = mNavBarMode == NAV_BAR_MODE_GESTURAL && (!mIsHintEnabled ||
+            mIsTaskbarEnabled);
         final int userId = ActivityManager.getCurrentUser();
         try {
             iom.setEnabled(OVERLAY_NAVIGATION_HIDE_HINT, state, userId);
