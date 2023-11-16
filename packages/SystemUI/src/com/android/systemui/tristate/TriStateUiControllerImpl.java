@@ -110,6 +110,9 @@ public class TriStateUiControllerImpl implements ConfigurationListener, TriState
         public void onLayoutDirectionChanged(int layoutDirection) { }
 
         @Override
+        public void onShowCsdWarning(int csdWarning, int durationMs) { }
+
+        @Override
         public void onShowVibrateHint() { }
 
         @Override
