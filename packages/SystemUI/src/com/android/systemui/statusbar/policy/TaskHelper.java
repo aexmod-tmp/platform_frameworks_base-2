@@ -24,6 +24,7 @@ import android.app.IActivityManager;
 import android.app.ActivityTaskManager;
 import android.app.ActivityTaskManager.RootTaskInfo;
 import android.app.IActivityTaskManager;
+import android.content.pm.ActivityInfo;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,6 +32,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -51,14 +53,15 @@ import com.android.systemui.statusbar.CommandQueue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton
-public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateController.Callback,
-        ConfigurationController.ConfigurationListener {
+public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateController.Callback {
+
     public interface Callback {
         public void onHomeVisibilityChanged(boolean isVisible);
     }
@@ -75,6 +78,14 @@ public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateControll
             Intent.ACTION_PACKAGE_REMOVED
     };
 
+    private static final Set<Integer> SUPPORTED_CHANGES = Set.of(
+            ActivityInfo.CONFIG_LOCALE,
+            ActivityInfo.CONFIG_UI_MODE,
+            ActivityInfo.CONFIG_ASSETS_PATHS,
+            ActivityInfo.CONFIG_DENSITY,
+            ActivityInfo.CONFIG_FONT_SCALE
+    );
+
     @Nullable
     private ComponentName mDefaultHome;
     private final ComponentName mRecentsComponentName;
@@ -82,6 +93,7 @@ public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateControll
     private ComponentName mTaskComponentName;
     private Context mContext;
     private final KeyguardStateController mKeyguardStateController;
+    private final Configuration mLastConfig;
     private PackageManager mPm;
     private boolean mKeyguardShowing;
     private TaskHelperHandler mHandler;
@@ -165,6 +177,7 @@ public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateControll
         mActivityTaskManager = ActivityTaskManager.getService();
         mInjector = new Injector();
         mHandler = new TaskHelperHandler(Looper.getMainLooper());
+        mLastConfig = new Configuration();
         IntentFilter homeFilter = new IntentFilter();
         for (String action : DEFAULT_HOME_CHANGE_ACTIONS) {
             homeFilter.addAction(action);
@@ -178,7 +191,6 @@ public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateControll
         mKeyguardStateController = Dependency.get(KeyguardStateController.class);
         mKeyguardStateController.addCallback(this);
         mPm = context.getPackageManager();
-        Dependency.get(ConfigurationController.class).addCallback(this);
         updateForegroundApp();
     }
 
@@ -235,7 +247,7 @@ public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateControll
         IActivityManager iam = ActivityManagerNative.getDefault();
         try {
             iam.forceStopPackage(mForegroundAppPackageName, UserHandle.USER_CURRENT); // kill
-                                                                                                // app
+                                                                                      // app
             iam.removeTask(mRunningTaskId); // remove app from recents
             killed = true;
         } catch (RemoteException e) {
@@ -260,11 +272,16 @@ public class TaskHelper implements CommandQueue.Callbacks, KeyguardStateControll
         mHandler.sendEmptyMessage(MSG_UPDATE_FOREGROUND_APP);
     }
 
-    @Override
-    public void onThemeChanged() {
-        // refresh callback states on theme change. Allow a slight delay
-        // so statusbar can reinflate and settle down
-        mHandler.sendEmptyMessageDelayed(MSG_UPDATE_CALLBACKS, 500);
+    public void onConfigurationChanged(Configuration newConfig) {
+        int diff = mLastConfig.updateFrom(newConfig);
+        for (int change: SUPPORTED_CHANGES) {
+            if ((diff & change) != 0) {
+                // refresh callback states on theme change. Allow a slight delay
+                // so statusbar can reinflate and settle down
+                mHandler.sendEmptyMessageDelayed(MSG_UPDATE_CALLBACKS, 500);
+                return;
+            }
+        }
     }
 
     public String getForegroundApp() {
