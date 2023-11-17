@@ -56,9 +56,8 @@ import com.android.systemui.plugins.VolumeDialogController;
 import com.android.systemui.plugins.VolumeDialogController.Callbacks;
 import com.android.systemui.plugins.VolumeDialogController.State;
 import com.android.systemui.statusbar.policy.ConfigurationController;
-import com.android.systemui.statusbar.policy.ConfigurationController.ConfigurationListener;
 
-public class TriStateUiControllerImpl implements ConfigurationListener, TriStateUiController {
+public class TriStateUiControllerImpl implements ConfigurationController.ConfigurationListener, TriStateUiController {
 
     private static String TAG = "TriStateUiControllerImpl";
 
@@ -93,6 +92,7 @@ public class TriStateUiControllerImpl implements ConfigurationListener, TriState
 
     private Context mContext;
     private final VolumeDialogController mVolumeDialogController;
+    private final ConfigurationController mConfigurationController;
     private final Callbacks mVolumeDialogCallback = new Callbacks() {
         @Override
         public void onShowRequested(int reason, boolean keyguardLocked, int lockTaskModeState) { }
@@ -207,8 +207,12 @@ public class TriStateUiControllerImpl implements ConfigurationListener, TriState
         }
     }
 
-    public TriStateUiControllerImpl(Context context) {
+    public TriStateUiControllerImpl(Context context,
+            VolumeDialogController volumeDialogController,
+            ConfigurationController configurationController) {
         mContext = context;
+        mVolumeDialogController = volumeDialogController;
+        mConfigurationController = configurationController;
         mHandler = new H(this);
         mOrientationListener = new OrientationEventListener(mContext, 3) {
             @Override
@@ -216,7 +220,6 @@ public class TriStateUiControllerImpl implements ConfigurationListener, TriState
                 checkOrientationType();
             }
         };
-        mVolumeDialogController = (VolumeDialogController) Dependency.get(VolumeDialogController.class);
         mIntentAction = context.getResources().getString(com.android.internal.R.string.config_alertSliderIntent);
         boolean mIntentActionSupported = mIntentAction != null && !mIntentAction.isEmpty();
 
@@ -241,13 +244,14 @@ public class TriStateUiControllerImpl implements ConfigurationListener, TriState
         mWindowType = windowType;
         mDensity = mContext.getResources().getConfiguration().densityDpi;
         mListener = listener;
-        ((ConfigurationController) Dependency.get(ConfigurationController.class)).addCallback(this);
+        mConfigurationController.addCallback(this);
         mVolumeDialogController.addCallback(mVolumeDialogCallback, mHandler);
         initDialog();
     }
 
     public void destroy() {
         ((ConfigurationController) Dependency.get(ConfigurationController.class)).removeCallback(this);
+        mConfigurationController.removeCallback(this);
         mVolumeDialogController.removeCallback(mVolumeDialogCallback);
         mContext.unregisterReceiver(mSliderStateReceiver);
     }
