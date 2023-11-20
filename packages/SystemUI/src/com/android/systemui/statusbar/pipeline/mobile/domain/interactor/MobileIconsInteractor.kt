@@ -96,6 +96,10 @@ interface MobileIconsInteractor {
 
     val showVowifiIcon: StateFlow<Boolean>
 
+    val showVolteIconPref: StateFlow<Boolean>
+    val showVoWiFiIconPref: StateFlow<Boolean>
+    val volteIconStyle: StateFlow<Int>
+    val voWiFiIconStyle: StateFlow<Int>
     /**
      * Vends out a [MobileIconInteractor] tracking the [MobileConnectionRepository] for the given
      * subId. Will throw if the ID is invalid
@@ -306,6 +310,22 @@ constructor(
             .mapLatest { it.showVowifiIcon }
             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
 
+    override val showVolteIconPref: StateFlow<Boolean> =
+        connectivityRepository.showVolteIconPref
+            .stateIn(scope, SharingStarted.WhileSubscribed(), true)
+
+    override val showVoWiFiIconPref: StateFlow<Boolean> =
+        connectivityRepository.showVoWiFiIconPref
+            .stateIn(scope, SharingStarted.WhileSubscribed(), true)
+
+    override val volteIconStyle: StateFlow<Int> =
+        connectivityRepository.volteIconStyle
+            .stateIn(scope, SharingStarted.WhileSubscribed(), 0)
+
+    override val voWiFiIconStyle: StateFlow<Int> =
+        connectivityRepository.voWiFiIconStyle
+            .stateIn(scope, SharingStarted.WhileSubscribed(), 0)
+
     /** Vends out new [MobileIconInteractor] for a particular subId */
     override fun createMobileConnectionInteractorForSubId(subId: Int): MobileIconInteractor =
         MobileIconInteractorImpl(
@@ -321,6 +341,10 @@ constructor(
             mobileConnectionsRepo.getRepoForSubId(subId),
             showVolteIcon,
             showVowifiIcon,
+            showVolteIconPref,
+            showVoWiFiIconPref,
+            volteIconStyle,
+            voWiFiIconStyle,
             context,
         )
 
