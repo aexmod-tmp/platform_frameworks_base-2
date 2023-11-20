@@ -124,6 +124,11 @@ interface MobileIconInteractor {
     val showVowifiIcon: StateFlow<Boolean>
 
     val voWifiAvailable: StateFlow<Boolean>
+
+    val showVolteIconPref: StateFlow<Boolean>
+    val showVoWiFiIconPref: StateFlow<Boolean>
+    val volteIconStyle: StateFlow<Int>
+    val voWiFiIconStyle: StateFlow<Int>
 }
 
 /** Interactor for a single mobile connection. This connection _should_ have one subscription ID */
@@ -142,6 +147,10 @@ class MobileIconInteractorImpl(
     connectionRepository: MobileConnectionRepository,
     override val showVolteIcon: StateFlow<Boolean>,
     override val showVowifiIcon: StateFlow<Boolean>,
+    override val showVolteIconPref: StateFlow<Boolean>,
+    override val showVoWiFiIconPref: StateFlow<Boolean>,
+    override val volteIconStyle: StateFlow<Int>,
+    override val voWiFiIconStyle: StateFlow<Int>,
     private val context: Context,
 
     val carrierIdOverrides: MobileIconCarrierIdOverrides = MobileIconCarrierIdOverridesImpl(),
