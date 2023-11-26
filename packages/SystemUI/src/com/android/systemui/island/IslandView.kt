@@ -17,7 +17,6 @@ package com.android.systemui.island
 
 import android.app.ActivityOptions
 import android.app.Notification
-import android.content.pm.ApplicationInfo
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -27,9 +26,11 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.Icon
 import android.graphics.Region
 import android.graphics.Typeface
 import android.os.AsyncTask
+import android.os.Bundle
 import android.os.Handler
 import android.os.UserHandle
 import android.os.VibrationEffect
@@ -44,7 +45,6 @@ import android.text.style.RelativeSizeSpan
 import android.text.style.StyleSpan
 import android.text.TextUtils
 import android.util.AttributeSet
-import android.util.IconDrawableFactory
 import android.view.MotionEvent
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
@@ -59,6 +59,7 @@ import com.android.systemui.statusbar.notification.stack.NotificationStackScroll
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 
 import kotlin.text.Regex
+import java.util.Locale;
 
 class IslandView : ExtendedFloatingActionButton {
 
@@ -153,9 +154,9 @@ class IslandView : ExtendedFloatingActionButton {
 
     fun animateDismissIsland() {
         post({
+            resetLayout()
             shrink()
             postOnAnimationDelayed({
-                resetLayout()
                 hide()
                 isIslandAnimating = false
                 isDismissed = true
@@ -215,16 +216,15 @@ class IslandView : ExtendedFloatingActionButton {
     private fun prepareIslandContent() {
         val sbn = headsUpManager?.topEntry?.row?.entry?.sbn ?: return
         val notification = sbn.notification
-        val largeIconBitmap = notification.extras.getParcelable<Bitmap>(Notification.EXTRA_LARGE_ICON)
         val notificationTitle = notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
         val notificationText = notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
-        val iconDrawable = if (largeIconBitmap != null) {
-            BitmapDrawable(context.resources, largeIconBitmap)
-        } else {
-            getNotificationIcon(sbn, notification)
-        } ?: return
-        if (largeIconBitmap != null) {
-            notifTitle = sbn?.packageName ?: ""
+        val largeBigIcon = getDrawableFromExtras(notification.extras, Notification.EXTRA_LARGE_ICON_BIG, context)
+        val largeIcon = getDrawableFromExtras(notification.extras, Notification.EXTRA_LARGE_ICON, context)
+        val smallIcon = getDrawableFromExtras(notification.extras, Notification.EXTRA_SMALL_ICON, context)
+        val iconDrawable = largeBigIcon ?: largeIcon ?: smallIcon ?: getNotificationIcon(sbn, notification) ?: return
+        if (largeBigIcon != null || largeIcon != null || smallIcon != null) {
+            val packageManager = context.packageManager
+            notifTitle = getAppLabel(sbn, context)
             if (notifTitle.isBlank()) return
             notifContent = if (notificationTitle.isNotBlank() && notificationText.isNotBlank()) {
                 "$notificationTitle : $notificationText"
@@ -257,7 +257,42 @@ class IslandView : ExtendedFloatingActionButton {
         this.icon = iconDrawable
         this.iconTint = null
         this.bringToFront()
-        setOnTouchListener(sbn.notification.contentIntent)
+        setOnTouchListener(sbn.notification.contentIntent, sbn.packageName)
+    }
+
+    fun getAppLabel(sbn: StatusBarNotification, context: Context): String {
+        val packageManager = context.packageManager
+        return try {
+            val appInfo = packageManager.getApplicationInfo(sbn.packageName, 0)
+            val appLabel = packageManager.getApplicationLabel(appInfo).toString()
+            appLabel.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        } catch (e: PackageManager.NameNotFoundException) {
+            sbn.packageName
+        }
+    }
+
+    private fun getDrawableFromExtras(extras: Bundle, key: String, context: Context): Drawable? {
+        val iconObject = extras.get(key) ?: return null
+        return when (iconObject) {
+            is Bitmap -> BitmapDrawable(context.resources, iconObject)
+            is Drawable -> iconObject
+            else -> {
+                (iconObject as? Icon)?.loadDrawable(context)
+            }
+        }
+    }
+
+    private fun getNotificationIcon(sbn: StatusBarNotification, notification: Notification): Drawable? {
+        return try {
+            val pkgname = sbn?.packageName
+            if ("com.android.systemui" == pkgname) {
+                context.getDrawable(notification.icon)
+            } else {
+                context.packageManager.getApplicationIcon(pkgname)
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            null
+        }
     }
 
     private fun SpannableStringBuilder.appendSpannable(spanText: String, size: Float, singleLine: Boolean) {
@@ -271,29 +306,10 @@ class IslandView : ExtendedFloatingActionButton {
         }
     }
 
-    private fun getNotificationIcon(sbn: StatusBarNotification, notification: Notification): Drawable? {
-        return try {
-            val pkgname = sbn?.packageName
-            val uid = sbn.getUser().getIdentifier()
-            val appInfo: ApplicationInfo = context.packageManager.getApplicationInfoAsUser(
-                    pkgname,
-                    PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
-                    uid)
-            if ("com.android.systemui" == pkgname) {
-                context.getDrawable(notification.icon)
-            } else {
-                val iconFactory: IconDrawableFactory = IconDrawableFactory.newInstance(context)
-                iconFactory.getBadgedIcon(appInfo, uid)
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            null
-        }
-    }
-
-    private fun setOnTouchListener(intent: PendingIntent) {
+    private fun setOnTouchListener(intent: PendingIntent, packageName: String) {
         val gestureDetector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                onSingleTap(intent)
+                onSingleTap(intent, packageName)
                 return true
             }
             override fun onLongPress(e: MotionEvent) {
@@ -319,13 +335,23 @@ class IslandView : ExtendedFloatingActionButton {
         AsyncTask.execute { vibrator?.vibrate(effectClick) }
     }
 
-    private fun onSingleTap(intent: PendingIntent) {
+    private fun onSingleTap(pendingIntent: PendingIntent, packageName: String) {
         if (isDeviceRinging()) {
             telecomManager?.acceptRingingCall()
         } else {
+            val appIntent = context.packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
             try {
-                intent.send()
-            } catch (e: Exception) {}
+                val options = ActivityOptions.makeBasic()
+                options.setPendingIntentBackgroundActivityStartMode(
+                        ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED)
+                pendingIntent.send(context, 0, appIntent, null, null, null, options.toBundle())
+            } catch (e: Exception) {
+                try {
+                    context.startActivityAsUser(appIntent, UserHandle.CURRENT)
+                } catch (e: Exception) {}
+            }
         }
         AsyncTask.execute { vibrator?.vibrate(effectTick) }
     }
