@@ -18,6 +18,7 @@ package com.android.systemui.navigationbar;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.WindowManagerPolicyConstants.NAV_BAR_MODE_3BUTTON;
+import static com.android.systemui.shared.recents.utilities.Utilities.isLargeScreen;
 
 import android.annotation.Nullable;
 import android.app.ActivityManager;
@@ -27,6 +28,7 @@ import android.content.om.IOverlayManager;
 import android.graphics.drawable.Icon;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -88,6 +90,10 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
     private static final String ABSOLUTE_SUFFIX = "A";
     private static final String ABSOLUTE_VERTICAL_CENTERED_SUFFIX = "C";
 
+    private static final String ENABLE_TASKBAR =
+            "system:" + Settings.System.ENABLE_TASKBAR;
+
+
     private static class Listener implements NavigationModeController.ModeChangedListener {
         private final WeakReference<NavigationBarInflaterView> mSelf;
 
@@ -137,6 +143,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
 
     private boolean mInverseLayout;
     private int mHomeHandleWidthMode = 1;
+    private boolean mIsTaskbarEnabled;
 
     public NavigationBarInflaterView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -196,6 +203,7 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         Dependency.get(TunerService.class).addTunable(this, NAV_BAR_INVERSE);
+        Dependency.get(TunerService.class).addTunable(this, ENABLE_TASKBAR);
     }
 
     private void onNavigationHandleWidthModeChanged(int mode) {
@@ -221,6 +229,10 @@ public class NavigationBarInflaterView extends FrameLayout implements TunerServi
         if (NAV_BAR_INVERSE.equals(key)) {
             mInverseLayout = TunerService.parseIntegerSwitch(newValue, false);
             updateLayoutInversion();
+        } else if (ENABLE_TASKBAR.equals(key)) {
+            mIsTaskbarEnabled =
+                TunerService.parseIntegerSwitch(newValue, isLargeScreen(mContext));
+            updateNavbar(mIsTaskbarEnabled ? 0: mHomeHandleWidthMode);
         }
     }
 
