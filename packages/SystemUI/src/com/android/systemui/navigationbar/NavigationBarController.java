@@ -258,7 +258,11 @@ public class NavigationBarController implements
 
     /** @return {@code true} if taskbar is enabled, false otherwise */
     private boolean initializeTaskbarIfNecessary() {
-        if (shouldShowTaskbar()) {
+        // Enable for large screens or (phone AND flag is set); assuming phone = !mIsLargeScreen
+        boolean taskbarEnabled = (shouldShowTaskbar() || mFeatureFlags.isEnabled(
+                Flags.HIDE_NAVBAR_WINDOW)) && shouldCreateNavBarAndTaskBar(mContext.getDisplayId());
+
+        if (taskbarEnabled) {
             Trace.beginSection("NavigationBarController#initializeTaskbarIfNecessary");
             final int displayId = mContext.getDisplayId();
             // Hint to NavBarHelper if we are replacing an existing bar to skip extra work
