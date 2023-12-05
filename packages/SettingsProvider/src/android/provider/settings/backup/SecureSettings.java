@@ -243,6 +243,5 @@ public class SecureSettings {
         Settings.Secure.ACCESSIBILITY_FONT_SCALING_HAS_BEEN_CHANGED,
         Settings.Secure.ADVANCED_REBOOT,
         Settings.Secure.QUICK_SETTINGS_TILES_VIBRATE,
-        Settings.Secure.GESTURE_NAVBAR_LENGTH_MODE,
     };
 }
