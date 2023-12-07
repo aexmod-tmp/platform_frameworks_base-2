@@ -72,11 +72,8 @@ import android.provider.Settings;
 import android.util.IndentingPrintWriter;
 import android.util.Log;
 import android.util.MathUtils;
-<<<<<<< HEAD
 import android.view.HapticFeedbackConstants;
-=======
 import android.view.GestureDetector;
->>>>>>> 4baf41ca48fa (SystemUI: Add double tap to sleep gesture)
 import android.view.InputDevice;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -3612,6 +3609,7 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
         );
     }
 
+    @Override
     public void setBlockedGesturalNavigation(boolean blocked) {
         mBlockedGesturalNavigation = blocked;
     }

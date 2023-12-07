@@ -129,7 +129,7 @@ public class PhoneStatusBarView extends FrameLayout {
     }
 
     void onDensityOrFontScaleChanged() {
-        mClock.onDensityOrFontScaleChanged();
+        mClockController.onDensityOrFontScaleChanged();
     }
 
     @Override

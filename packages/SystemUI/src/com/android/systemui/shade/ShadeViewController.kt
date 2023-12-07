@@ -108,6 +108,8 @@ interface ShadeViewController {
     /** Returns whether status bar icons should be hidden when the shade is expanded. */
     fun shouldHideStatusBarIconsWhenExpanded(): Boolean
 
+    fun setBlockedGesturalNavigation(blocked: Boolean)
+
     /**
      * Do not let the user drag the shade up and down for the current touch session. This is
      * necessary to avoid shade expansion while/after the bouncer is dismissed.

@@ -101,6 +101,12 @@ public class TriStateUiControllerImpl implements ConfigurationListener, TriState
         public void onDismissRequested(int reason) { }
 
         @Override
+        public void onShowCsdWarning(int csdWarning, int durationMs) { }
+
+        @Override
+        public void onCaptionEnabledStateChanged(Boolean isEnabled, Boolean checkForSwitchState) { }
+
+        @Override
         public void onScreenOff() { }
 
         @Override

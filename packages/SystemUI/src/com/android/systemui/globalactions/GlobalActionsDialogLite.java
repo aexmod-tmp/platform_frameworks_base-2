@@ -1318,7 +1318,7 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
                 }
                 mHandler.post(() -> {
                     Runnable onScreenRecord = () -> {
-                        mCentralSurfacesOptional.ifPresent(CentralSurfaces::collapseShade);
+                        mShadeController.cancelExpansionAndCollapseShade();
                     };
                     Dialog screenRecordDialog =
                         mRecordingController.createScreenRecordDialog(mContext, mFlags,

@@ -185,6 +185,7 @@ import com.android.systemui.settings.brightness.BrightnessSliderController;
 import com.android.systemui.shade.CameraLauncher;
 import com.android.systemui.shade.NotificationShadeWindowView;
 import com.android.systemui.shade.NotificationShadeWindowViewController;
+import com.android.systemui.shade.QQSGestureListener;
 import com.android.systemui.shade.QuickSettingsController;
 import com.android.systemui.shade.ShadeController;
 import com.android.systemui.shade.ShadeExpansionChangeEvent;
@@ -3325,12 +3326,8 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
 
     @Override
     public void setBlockedGesturalNavigation(boolean blocked) {
-        NotificationPanelViewController npvc =
-                mCentralSurfacesComponent.getNotificationPanelViewController();
-        if (npvc != null) {
-            npvc.setBlockedGesturalNavigation(blocked);
-            npvc.updateSystemUiStateFlags();
-        }
+            mShadeSurface.setBlockedGesturalNavigation(blocked);
+            mShadeSurface.updateSystemUiStateFlags();
         if (getNavigationBarView() != null) {
             getNavigationBarView().setBlockedGesturalNavigation(blocked, mSysUiState);
         }

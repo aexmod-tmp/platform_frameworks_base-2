@@ -26,13 +26,13 @@ import com.android.systemui.plugins.FalsingManager
 import com.android.systemui.plugins.statusbar.StatusBarStateController
 import com.android.systemui.statusbar.StatusBarState
 import com.android.systemui.statusbar.phone.CentralSurfaces
-import com.android.systemui.statusbar.phone.dagger.CentralSurfacesComponent
+import com.android.systemui.dagger.SysUISingleton;
 import com.android.systemui.tuner.TunerService
 import com.android.systemui.tuner.TunerService.Tunable
 
 import javax.inject.Inject
 
-@CentralSurfacesComponent.CentralSurfacesScope
+@SysUISingleton
 class QQSGestureListener @Inject constructor(
         private val falsingManager: FalsingManager,
         private val powerManager: PowerManager,
@@ -86,7 +86,7 @@ class QQSGestureListener @Inject constructor(
         } else if (!statusBarStateController.isDozing &&
             lockscreenDT2SEnabled &&
             statusBarStateController.getState() == StatusBarState.KEYGUARD &&
-            !centralSurfaces.isBouncerShowing()            
+            !centralSurfaces.isBouncerShowing()
         ) {
             powerManager.goToSleep(e.getEventTime())
             return true
