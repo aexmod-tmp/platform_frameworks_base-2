@@ -293,15 +293,15 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
             mLandscapeDrawableiOS16.setBatteryLevel(mLevel);
             updatePercentText();
         }
-        if (mCharging != pluggedIn) {
-            mCharging = pluggedIn;
-            mAccessorizedDrawable.setCharging(mCharging);
-            mCircleDrawable.setCharging(mCharging);
-            mFullCircleDrawable.setCharging(mCharging);
-            mRLandscapeDrawable.setCharging(mCharging);
-            mLandscapeDrawable.setCharging(mCharging);
-            mLandscapeDrawableiOS15.setCharging(mCharging);
-            mLandscapeDrawableiOS16.setCharging(mCharging);
+        if (mPluggedIn != pluggedIn) {
+            mPluggedIn = pluggedIn;
+            mAccessorizedDrawable.setCharging(mPluggedIn);
+            mCircleDrawable.setCharging(mPluggedIn);
+            mFullCircleDrawable.setCharging(mPluggedIn);
+            mRLandscapeDrawable.setCharging(mPluggedIn);
+            mLandscapeDrawable.setCharging(mPluggedIn);
+            mLandscapeDrawableiOS15.setCharging(mPluggedIn);
+            mLandscapeDrawableiOS16.setCharging(mPluggedIn);
             updateShowPercent();
             updatePercentText();
         }
@@ -332,7 +332,14 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         boolean valueChanged = mIsIncompatibleCharging != isIncompatibleCharging;
         mIsIncompatibleCharging = isIncompatibleCharging;
         if (valueChanged) {
-            mDrawable.setCharging(isCharging());
+            mAccessorizedDrawable.setCharging(isCharging());
+            mCircleDrawable.setCharging(isCharging());
+            mFullCircleDrawable.setCharging(isCharging());
+            mRLandscapeDrawable.setCharging(isCharging());
+            mLandscapeDrawable.setCharging(isCharging());
+            mLandscapeDrawableiOS15.setCharging(isCharging());
+            mLandscapeDrawableiOS16.setCharging(isCharging());
+
             updateContentDescription();
         }
     }
@@ -382,7 +389,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
 
         mEstimateText = null;
 
-        if (mBatteryEstimateFetcher != null && mShowPercentMode == MODE_ESTIMATE && !mCharging) {
+        if (mBatteryEstimateFetcher != null && mShowPercentMode == MODE_ESTIMATE && !mPluggedIn) {
             mBatteryEstimateFetcher.fetchBatteryTimeRemainingEstimate(
                     (String estimate) -> {
                 if (mBatteryPercentView == null) {
@@ -403,7 +410,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
             // Use the high voltage symbol ⚡ (u26A1 unicode) but prevent the system
             // to load its emoji colored variant with the uFE0E flag
             String bolt = "\u26A1\uFE0E";
-            CharSequence mChargeIndicator = mCharging && (mBatteryStyle == BATTERY_STYLE_HIDDEN ||
+            CharSequence mChargeIndicator = mPluggedIn && (mBatteryStyle == BATTERY_STYLE_HIDDEN ||
                     mBatteryStyle == BATTERY_STYLE_TEXT || mBatteryStyle == BATTERY_STYLE_FULL_CIRCLE)
                     ? (bolt + " ") : "";
             String percentText = mChargeIndicator + text;
@@ -453,7 +460,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
 
     void updateShowPercent() {
         boolean drawPercentInside = mShowBatteryPercent == 1
-                                    && !mCharging && !mBatteryStateUnknown;
+                                    && !mPluggedIn && !mBatteryStateUnknown;
         boolean showPercent = mShowBatteryPercent >= 2
                                     || mBatteryStyle == BATTERY_STYLE_TEXT
                                     || mShowPercentMode == MODE_ON;
@@ -468,7 +475,7 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
         mLandscapeDrawableiOS15.setShowPercent(drawPercentInside);
         mLandscapeDrawableiOS16.setShowPercent(drawPercentInside);
 
-        if (showPercent || (mBatteryPercentCharging && mCharging)
+        if (showPercent || (mBatteryPercentCharging && mPluggedIn)
                 || mShowPercentMode == MODE_ESTIMATE) {
             if (mBatteryPercentView == null) {
                 mBatteryPercentView = loadPercentView();
@@ -690,8 +697,8 @@ public class BatteryMeterView extends LinearLayout implements DarkReceiver {
     public void dump(PrintWriter pw, String[] args) {
         String powerSave = mAccessorizedDrawable == null ?
                 null : mAccessorizedDrawable.getPowerSaveEnabled() + "";
-        String displayShield = mDrawable == null ? null : mDrawable.getDisplayShield() + "";
-        String charging = mDrawable == null ? null : mDrawable.getCharging() + "";
+        String displayShield = mAccessorizedDrawable == null ? null : mAccessorizedDrawable.getDisplayShield() + "";
+        String charging = mAccessorizedDrawable == null ? null : mAccessorizedDrawable.getCharging() + "";
         CharSequence percent = mBatteryPercentView == null ? null : mBatteryPercentView.getText();
         pw.println("  BatteryMeterView:");
         pw.println("    getPowerSave: " + powerSave);
