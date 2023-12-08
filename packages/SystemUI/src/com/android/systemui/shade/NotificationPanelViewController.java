@@ -4762,7 +4762,8 @@ public final class NotificationPanelViewController implements ShadeSurface, Dump
                                 config_dt2sGestureEnabledByDefault));
                     break;
                 case ISLAND_NOTIFICATION:
-                    mIslandEnabled = TunerService.parseIntegerSwitch(newValue, true);
+                    mUseIslandNotification = TunerService.parseIntegerSwitch(newValue, true);
+                    mNotifIsland.setIslandEnabled(mUseIslandNotification);
                     break;
                 default:
                     break;

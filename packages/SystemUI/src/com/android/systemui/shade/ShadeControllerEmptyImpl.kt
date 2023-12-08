@@ -67,5 +67,4 @@ open class ShadeControllerEmptyImpl @Inject constructor() : ShadeController {
     override fun onLaunchAnimationCancelled(isLaunchForActivity: Boolean) {}
     override fun onLaunchAnimationEnd(launchIsFullScreen: Boolean) {}
 
-    override fun showIsland(show: Boolean) {}
 }
