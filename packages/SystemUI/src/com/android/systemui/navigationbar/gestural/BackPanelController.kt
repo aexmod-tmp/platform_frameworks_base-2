@@ -974,6 +974,7 @@ internal constructor(
                         mView,
                         HapticFeedbackConstants.GESTURE_THRESHOLD_DEACTIVATE
                     )
+                }
 //                } else {
 //                    vibratorHelper.vibrate(VIBRATE_DEACTIVATED_EFFECT)
 //                }
