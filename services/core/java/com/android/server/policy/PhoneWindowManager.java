@@ -3229,6 +3229,19 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
         }
 
+        // Specific device key handling
+        if (mDeviceKeyHandler != null) {
+            try {
+                // The device only will consume known keys.
+                if (mDeviceKeyHandler.canHandleKeyEvent(event)) {
+                    return keyConsumed;
+                }
+            } catch (Exception e) {
+                Slog.w(TAG, "Could not dispatch event to device key handler", e);
+            }
+        }
+
+
         return needToConsumeKey ? keyConsumed : keyNotConsumed;
     }
 
@@ -3631,18 +3644,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (isValidGlobalKey(keyCode)
                 && mGlobalKeyManager.handleGlobalKey(mContext, keyCode, event)) {
             return true;
-        }
-
-        // Specific device key handling
-        if (mDeviceKeyHandler != null) {
-            try {
-                // The device only will consume known keys.
-                if (mDeviceKeyHandler.canHandleKeyEvent(event)) {
-                    return key_consumed;
-                }
-            } catch (Exception e) {
-                Slog.w(TAG, "Could not dispatch event to device key handler", e);
-            }
         }
 
         // Reserve all the META modifier combos for system behavior
