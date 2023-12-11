@@ -179,13 +179,6 @@ object MobileIconBinder {
 
                     launch { decorTint.collect { tint -> dotView.setDecorColor(tint) } }
 
-                    try {
-                        awaitCancellation()
-                    } finally {
-                        isCollecting = false
-                        logger.logCollectionStopped(view, viewModel)
-                    }
-
                     launch {
                         viewModel.volteId.distinctUntilChanged().collect { volteId ->
                             if (volteId != 0) {
@@ -195,6 +188,13 @@ object MobileIconBinder {
                                 volteView.visibility = GONE
                             }
                         }
+                    }
+
+                    try {
+                        awaitCancellation()
+                    } finally {
+                        isCollecting = false
+                        logger.logCollectionStopped(view, viewModel)
                     }
 
                 }
