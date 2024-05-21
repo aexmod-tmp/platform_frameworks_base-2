@@ -40,7 +40,7 @@ import android.widget.TextView;
 import android.provider.Settings;
 
 import com.android.systemui.Dependency;
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 import com.android.systemui.tuner.TunerService;
 
 import java.text.DecimalFormat;
