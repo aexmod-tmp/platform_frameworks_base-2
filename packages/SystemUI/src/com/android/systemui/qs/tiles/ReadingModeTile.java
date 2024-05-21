@@ -22,7 +22,7 @@ import android.service.quicksettings.Tile;
 import com.android.systemui.plugins.qs.QSTile.BooleanState;
 import com.android.systemui.qs.QSHost;
 import com.android.systemui.qs.tileimpl.QSTileImpl;
-import com.android.systemui.R;
+import com.android.systemui.res.R;
 
 import android.os.Handler;
 import android.os.Looper;
