@@ -177,10 +177,10 @@ public class CommandQueue extends IStatusBar.Stub implements
     private static final int MSG_CONFIRM_IMMERSIVE_PROMPT = 77 << MSG_SHIFT;
     private static final int MSG_IMMERSIVE_CHANGED = 78 << MSG_SHIFT;
     private static final int MSG_SET_QS_TILES = 79 << MSG_SHIFT;
-    private static final int MSG_TOGGLE_CAMERA_FLASH = 100 << MSG_SHIFT;
-    private static final int MSG_KILL_FOREGROUND_APP = 101 << MSG_SHIFT;
-    private static final int MSG_TOGGLE_SETTINGS_PANEL = 102 << MSG_SHIFT;
-    private static final int MSG_SET_BLOCKED_GESTURAL_NAVIGATION = 103 << MSG_SHIFT;
+    private static final int MSG_TOGGLE_CAMERA_FLASH = 80 << MSG_SHIFT;
+    private static final int MSG_KILL_FOREGROUND_APP = 81 << MSG_SHIFT;
+    private static final int MSG_TOGGLE_SETTINGS_PANEL = 82 << MSG_SHIFT;
+    private static final int MSG_SET_BLOCKED_GESTURAL_NAVIGATION = 83 << MSG_SHIFT;
 
     // Device Integration: new case to handler disable message from VirtualDisplay
     private static final int MSG_DISABLE_VD = 100 << MSG_SHIFT;
