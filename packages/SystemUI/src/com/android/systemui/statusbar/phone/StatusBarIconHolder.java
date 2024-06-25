@@ -60,15 +60,17 @@ public class StatusBarIconHolder {
     @Deprecated
     public static final int TYPE_WIFI_NEW = 4;
 
+    public static final int TYPE_NETWORK_TRAFFIC = 5;
+
     @IntDef({
             TYPE_ICON,
             TYPE_MOBILE_NEW,
-            TYPE_WIFI_NEW
+            TYPE_WIFI_NEW,
+            TYPE_NETWORK_TRAFFIC
     })
     @Retention(RetentionPolicy.SOURCE)
     @interface IconType {}
 
-    public static final int TYPE_NETWORK_TRAFFIC = 5;
 
     private StatusBarIcon mIcon;
     private @IconType int mType = TYPE_ICON;
